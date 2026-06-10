@@ -14,9 +14,7 @@ function App() {
 
     const response = await fetch("http://127.0.0.1:8000/analyze", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         url,
         old_positioning: oldPositioning,
@@ -29,13 +27,19 @@ function App() {
     setLoading(false);
   }
 
+  function getHostname(value) {
+    try {
+      return new URL(value).hostname;
+    } catch {
+      return value;
+    }
+  }
+
   return (
     <div className="app">
       <div className="hero">
         <h1>Website Repositioning Copilot</h1>
-
         <h2>Turn positioning intent into website execution.</h2>
-
         <p className="subtitle">
           Analyze a public website, identify messaging impacted by a positioning
           change, estimate effort, and generate suggested rewrites.
@@ -85,8 +89,8 @@ function App() {
               <span>Confidence</span>
               <strong>
                 {result.analysis.confidence > 1
-                ? `${Math.round(result.analysis.confidence)}%`
-                : `${Math.round(result.analysis.confidence * 100)}%`}
+                  ? `${Math.round(result.analysis.confidence)}%`
+                  : `${Math.round(result.analysis.confidence * 100)}%`}
               </strong>
             </div>
 
@@ -106,8 +110,28 @@ function App() {
             <p>{result.analysis.reason}</p>
           </section>
 
+          {result.analysis.recommended_starting_points?.length > 0 && (
+            <section className="insight-section">
+              <h3>Recommended Starting Points</h3>
+              <ol>
+                {result.analysis.recommended_starting_points.map(
+                  (item, index) => (
+                    <li key={index}>{item}</li>
+                  )
+                )}
+              </ol>
+            </section>
+          )}
+
+          {result.analysis.effort_details && (
+            <section className="insight-section">
+              <h3>Effort Assessment</h3>
+              <p>{result.analysis.effort_details}</p>
+            </section>
+          )}
+
           <section className="insight-section">
-            <h3>Affected Messaging</h3>
+            <h3>Key Messaging Conflicts</h3>
             <ul>
               {result.analysis.old_messaging_examples?.map((item, index) => (
                 <li key={index}>{item}</li>
@@ -118,16 +142,40 @@ function App() {
           <section className="insight-section">
             <h3>Suggested Rewrites</h3>
 
+            <p className="rewrite-summary">
+              {result.analysis.suggested_rewrites?.length || 0} recommended
+              changes for new positioning.
+            </p>
+
             <div className="rewrite-grid">
               {result.analysis.suggested_rewrites
                 ?.slice(0, 5)
                 .map((rewrite, index) => (
                   <div className="rewrite-card" key={index}>
-                    <h4>Before</h4>
-                    <p>{rewrite.before}</p>
+                    <div className="rewrite-header">
+                      <span>
+                        Change #{index + 1} • 📍{" "}
+                        {rewrite.location || "Unknown"}
+                      </span>
 
-                    <h4>After</h4>
-                    <p>{rewrite.after}</p>
+                      <a
+                        href={rewrite.source_url || result.url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        🌐 {getHostname(rewrite.source_url || result.url)}
+                      </a>
+                    </div>
+
+                    <div className="before-block">
+                      <h4>Before</h4>
+                      <p>{rewrite.before}</p>
+                    </div>
+
+                    <div className="after-block">
+                      <h4>After</h4>
+                      <p>{rewrite.after}</p>
+                    </div>
 
                     <h4>Why</h4>
                     <p>{rewrite.why}</p>

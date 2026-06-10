@@ -8,17 +8,18 @@ load_dotenv()
 client = Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 
-def analyze_positioning_change(page_text, old_positioning, new_positioning):
+def analyze_positioning_change(page_text, old_positioning, new_positioning, page_url):
     prompt = f"""
 You are analyzing website copy for a marketing repositioning project.
-
-The company is changing its positioning.
 
 OLD POSITIONING:
 {old_positioning}
 
 NEW POSITIONING:
 {new_positioning}
+
+SOURCE URL:
+{page_url}
 
 Analyze the website content below.
 
@@ -28,19 +29,42 @@ Return valid JSON only with this structure:
   "impact_level": "High | Medium | Low | None",
   "confidence": 0,
   "reason": "",
+  "recommended_starting_points": [
+    ""
+  ],
   "old_messaging_examples": [
     ""
   ],
   "suggested_rewrites": [
     {{
+      "source_url": "{page_url}",
+      "location": "Homepage Hero | Navigation | Product Overview | Feature Section | CTA Section | Footer | Unknown",
       "before": "",
       "after": "",
       "why": ""
     }}
   ],
   "estimated_manual_minutes": 0,
-  "estimated_assisted_minutes": 0
+  "estimated_assisted_minutes": 0,
+  "effort_estimate": "High | Medium | Low",
+  "effort_details": ""
 }}
+
+Rules:
+- Return JSON only.
+- confidence should be a number between 0 and 1.
+- impact_level must be only High, Medium, Low, or None.
+- effort_estimate must be only High, Medium, or Low.
+- Put effort explanation in effort_details, not effort_estimate.
+- Provide 3 recommended_starting_points ordered by impact.
+- Limit suggested_rewrites to the top 5 highest-impact changes.
+
+For each suggested rewrite:
+- Include source_url.
+- Use the provided SOURCE URL as the source_url value.
+- Include a best-effort location label describing where the messaging appears on the page.
+- Location should be specific enough for a marketer to know where to look.
+- If the exact location is unclear, use "Unknown".
 
 Website content:
 \"\"\"
@@ -50,18 +74,13 @@ Website content:
 
     response = client.messages.create(
         model="claude-haiku-4-5",
-        max_tokens=1200,
+        max_tokens=1600,
         temperature=0.2,
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
+        messages=[{"role": "user", "content": prompt}],
     )
 
     content = response.content[0].text.strip()
- 
+
     start = content.find("{")
     end = content.rfind("}") + 1
 
@@ -82,9 +101,21 @@ Required schema:
   "impact_level": "High",
   "confidence": 0.95,
   "reason": "short explanation",
+  "recommended_starting_points": [],
   "old_messaging_examples": [],
-  "suggested_rewrites": [],
-  "effort_estimate": "short effort estimate"
+  "suggested_rewrites": [
+    {{
+      "source_url": "{page_url}",
+      "location": "Homepage Hero",
+      "before": "original copy",
+      "after": "rewritten copy",
+      "why": "short explanation"
+    }}
+  ],
+  "estimated_manual_minutes": 0,
+  "estimated_assisted_minutes": 0,
+  "effort_estimate": "High",
+  "effort_details": "short explanation"
 }}
 
 Broken JSON:
@@ -93,14 +124,9 @@ Broken JSON:
 
         repair_response = client.messages.create(
             model="claude-haiku-4-5",
-            max_tokens=1200,
+            max_tokens=1600,
             temperature=0,
-            messages=[
-                {
-                    "role": "user",
-                    "content": repair_prompt,
-                }
-            ],
+            messages=[{"role": "user", "content": repair_prompt}],
         )
 
         repaired_content = repair_response.content[0].text.strip()
@@ -121,6 +147,7 @@ if __name__ == "__main__":
         page_text=page_text,
         old_positioning="customer platform for go-to-market teams",
         new_positioning="AI content operations platform for marketing teams",
+        page_url=url,
     )
 
     print(json.dumps(result, indent=2))

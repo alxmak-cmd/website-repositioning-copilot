@@ -39,9 +39,10 @@ def analyze(request: AnalyzeRequest):
         }
 
     result = analyze_positioning_change(
-        page_text=page_text,
-        old_positioning=request.old_positioning,
-        new_positioning=request.new_positioning,
+    page_text=page_text,
+    old_positioning=request.old_positioning,
+    new_positioning=request.new_positioning,
+    page_url=request.url,
     )
 
     return {
