@@ -1,0 +1,19 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  color: #171717;
+  background: #f6f5f2;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: #171717;
+  background: #f6f5f2;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
