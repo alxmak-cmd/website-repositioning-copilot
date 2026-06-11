@@ -5,3 +5,4 @@ trafilatura
 beautifulsoup4
 httpx
 python-dotenv
+requests
