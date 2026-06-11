@@ -8,6 +8,40 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const examples = [
+    {
+      name: "B2B SaaS repositioning",
+      url: "https://www.hubspot.com",
+      oldPositioning:
+        "Go-to-market customer platform for marketing, sales, and service teams.",
+      newPositioning:
+        "AI content operations platform for enterprise marketing teams.",
+    },
+    {
+      name: "Developer platform shift",
+      url: "https://www.vercel.com",
+      oldPositioning:
+        "Frontend cloud platform for developers and modern web teams.",
+      newPositioning:
+        "AI-native application deployment platform for product engineering teams.",
+    },
+    {
+      name: "Fintech platform expansion",
+      url: "https://stripe.com",
+      oldPositioning:
+        "Payments infrastructure for internet businesses.",
+      newPositioning:
+        "Financial operating system for AI-native companies.",
+    },
+  ];
+
+  function loadExample(example) {
+    setUrl(example.url);
+    setOldPositioning(example.oldPositioning);
+    setNewPositioning(example.newPositioning);
+    setResult(null);
+  }
+
   async function analyzeWebsite() {
     setLoading(true);
     setResult(null);
@@ -44,6 +78,21 @@ function App() {
           Analyze a public website, identify messaging impacted by a positioning
           change, estimate effort, and generate suggested rewrites.
         </p>
+      </div>
+
+      <div className="example-bar">
+        <span>Demo scenarios:</span>
+
+        {examples.map((example) => (
+          <button
+            key={example.name}
+            type="button"
+            className="example-button"
+            onClick={() => loadExample(example)}
+          >
+            {example.name}
+          </button>
+        ))}
       </div>
 
       <div className="form-grid">

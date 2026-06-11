@@ -21,6 +21,33 @@ body {
   padding: 24px;
 }
 
+.example-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0;
+  flex-wrap: wrap;
+}
+
+.example-bar span {
+  font-weight: 600;
+  color: #444;
+}
+
+.example-button {
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.example-button:hover {
+  background: #f5f5f5;
+}
+
 .subtitle {
   color: #475569;
   margin-bottom: 32px;
