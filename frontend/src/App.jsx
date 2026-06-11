@@ -21,7 +21,7 @@ function App() {
       name: "Developer platform shift",
       url: "https://www.vercel.com",
       oldPositioning:
-        "Frontend cloud platform for developers and modern web teams.",
+        "Build and deploy on the AI Cloud",
       newPositioning:
         "AI-native application deployment platform for product engineering teams.",
     },
